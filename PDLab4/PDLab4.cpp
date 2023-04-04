@@ -11,7 +11,21 @@ float rnd(float number)
 
 float estimate(float (*matrix), float (*x), float (*y), int n, int m)
 {
-
+    float yPred, tempX, sum;
+    sum = 0;
+    for (int i = 0; i < n; i++)
+    {
+        yPred = 0;
+        tempX = 1;
+        for (int j = m; j >= 0; j--)
+        {
+            yPred += tempX * matrix[j];
+            tempX *= x[i];
+        }
+        sum += (y[i] - yPred) * (y[i] - yPred);
+    }
+    std::cout << '\n' << sum << '\n';
+    return sum;
 }
 
 void findCoefficients(float(*sums), float(*matrix), int m)
@@ -30,16 +44,16 @@ void findCoefficients(float(*sums), float(*matrix), int m)
         equations[i][m + 1] = sums[i + 2 * (m + 1) - 1];
     }
 
-    for (int i = 0; i < m + 1; i++)
-    {
-        std::cout << '\n';
-        for (int j = 0; j < m + 2; j++)
-        {
-            std::cout << equations[i][j] << ' ';
-        }
-    }
-    std::cout << '\n';
-    std::cout << '\n';
+    //for (int i = 0; i < m + 1; i++)
+    //{
+    //    std::cout << '\n';
+    //    for (int j = 0; j < m + 2; j++)
+    //    {
+    //        std::cout << equations[i][j] << ' ';
+    //    }
+    //}
+    //std::cout << '\n';
+    //std::cout << '\n';
 
     float temp;
     for (int i = 0; i < m + 1; i++)
@@ -79,10 +93,10 @@ void findCoefficients(float(*sums), float(*matrix), int m)
         }
         matrix[i] = rnd(temp);
     }
-    for (int k = 0; k < m + 1; k++)
+    /*for (int k = 0; k < m + 1; k++)
     {
         std::cout << matrix[k] << ' ';
-    }
+    }*/
 }
 
 void fillMatrixString(float(*arr), int n, int m, int start, float(*x), float(*y))
@@ -142,7 +156,6 @@ void fillMatrixString(float(*arr), int n, int m, int start, float(*x), float(*y)
 
     findCoefficients(matrix[n], arr, m);
 
-
 }
 
 void task1(float(*x), float(*y), int n, int m)
@@ -161,12 +174,26 @@ void task1(float(*x), float(*y), int n, int m)
     std::cout << "\n";
 
     float** matrix = new float*[m + 1];
+    float bestEstimate = float('INF');
+    int bestFunctionsIndex = 0;
+    float tempEstimate;
     for (int i = 1; i < m + 1; i++)
     {
         matrix[i] = new float[m + 1];
         fillMatrixString(matrix[i], n, i, i, x, y);
-        estimate(matrix[i], x, y, n, m);
+        tempEstimate = estimate(matrix[i], x, y, n, m);
+        if (tempEstimate < bestEstimate)
+        {
+            bestEstimate = tempEstimate;
+            bestFunctionsIndex = i;
+        }
     }
+    std::cout << "Function is: ";
+    for (int i = 0; i < bestFunctionsIndex; i++)
+    {
+        std::cout << matrix[bestFunctionsIndex][i] << "x^" << bestFunctionsIndex - i << " + ";
+    }
+    std::cout << matrix[bestFunctionsIndex][bestFunctionsIndex] << "\nIt's estimate: " << bestEstimate << '\n';
 }
 
 int main()
